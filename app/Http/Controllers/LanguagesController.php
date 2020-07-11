@@ -9,7 +9,7 @@ class LanguagesController extends Controller
 {
 	private function getRepos()
 	{
-		$response = Http::get('https://api.github.com/search/repositories?q=created:>2020-07-10&sort=stars&order=desc&per_page=100');
+		$response = Http::get('https://api.github.com/search/repositories?q=created:>2020-06-10&sort=stars&order=desc&per_page=100');
     	$repos=json_decode($response->body())->items;
 
     	return $repos;
