@@ -23,3 +23,4 @@ Route::get('/', function () {
 });
 
 Route::get('/languages', 'LanguagesController@showLanguages');
+Route::get('/repos-using-languages', 'LanguagesController@showReposUsingLanguages');

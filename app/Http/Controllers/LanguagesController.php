@@ -10,25 +10,44 @@ class LanguagesController extends Controller
 	private function getRepos()
 	{
 		$response = Http::get('https://api.github.com/search/repositories?q=created:>2020-07-10&sort=stars&order=desc&per_page=100');
-    	$repos=json_decode($response->body());
-    	$repos=$repos->items;
+    	$repos=json_decode($response->body())->items;
 
     	return $repos;
 	}
 
-	private function getLanguages()
+	private function getLanguagesAndRepos()
 	{
 		$repos=$this->getRepos();
     	$languages=array_column($repos, 'language'); // Get languages of all repos
-    	$languages=array_filter($languages); // Remove nulls
-    	$languages = array_values($languages); 
-    	return $languages;
+    	$languages=array_values(array_unique(array_filter($languages))); // Remove nulls
+    	return ['languages'=>$languages,'repos'=>$repos];
 	}
 
 
     public function showLanguages()
     {
-    	return  response()->json($this->getLanguages());
+    	return  response()->json($this->getLanguagesAndRepos()['languages']);
 	}
 
+	public function showReposUsingLanguages()
+	{
+		$languages=$this->getLanguagesAndRepos()['languages'];
+		$repos=$this->getLanguagesAndRepos()['repos'];
+		
+		$response=[];
+		foreach ($languages as $key => $language) {
+			
+			// A callback function sent as a parameter to 
+			// array_filter funnction to return repos of a certain language
+			$filter_callback=function ($value,$key) use ($language) {
+			return $value->language==$language;
+			};
+			$repos_using_language=array_values(array_filter($repos,$filter_callback,ARRAY_FILTER_USE_BOTH));
+
+			$language_data=['language'=>$language,'number_of_repos'=>count($repos_using_language),'repos'=>$repos_using_language];
+			array_push($response, $language_data);
+		}
+
+		return  response()->json($response);
+	}
 }
