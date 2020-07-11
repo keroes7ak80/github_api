@@ -31,8 +31,9 @@ class LanguagesController extends Controller
 
 	public function showReposUsingLanguages()
 	{
-		$languages=$this->getLanguagesAndRepos()['languages'];
-		$repos=$this->getLanguagesAndRepos()['repos'];
+		$languages_repos=$this->getLanguagesAndRepos();
+		$languages=$languages_repos['languages'];
+		$repos=$languages_repos['repos'];
 		
 		$response=[];
 		foreach ($languages as $key => $language) {
